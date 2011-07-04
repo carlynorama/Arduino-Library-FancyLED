@@ -1,0 +1,41 @@
+#######################################
+# Syntax Coloring Map For Test
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+FancyLED	                KEYWORD1
+
+#######################################
+# Methods and Functions (	 KEYWORD2)
+#######################################
+
+setCurrentTime	        	KEYWORD2
+turnOn	                	KEYWORD2
+turnOnWithDuration	    	KEYWORD2
+turnOnAnalog	        	KEYWORD2
+turnOff	                	KEYWORD2	
+toggle	                	KEYWORD2
+blinkWithoutDelay	 	    KEYWORD2
+delayBlinkWithCount	 	    KEYWORD2	
+getBlinkPeriod	 	        KEYWORD2
+setBlinkPeriod	 	        KEYWORD2
+turnOnAnalog                KEYWORD2
+brighten                    KEYWORD2
+dim                         KEYWORD2
+getBrightness               KEYWORD2
+setBrightness               KEYWORD2
+getBrightnessIncrement      KEYWORD2
+setBrightnessIncrement      KEYWORD2
+
+
+######################################
+# Instances (	 KEYWORD2)
+#######################################
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
