@@ -25,52 +25,28 @@ class FancyLED {
     //unsigned char getRegisterValue(void);
 
     void setCurrentTime(unsigned long);
+    void update(unsigned long);
+    void update(void);
     
-    bool getState(void);
-	void setState(bool);
-	bool isOn(void);
-	bool isOff(void);
+    int getState(void);
     
-    void turnOn(void);
-	//void turnOnWithDuration(unsigned int onPeriod);
-	
+    void turnOn(void);	
     void turnOff(void);
-	
-	void toggle(void);
-	
-	void blinkWithoutDelay(void);
-    void blinkWithoutDelay(unsigned int blinkPeriod);
+    void toggle(void);
+ 
+    void pulse(char); 
+    void pulse(char, int, int);
+	void pulse(void);	
 
-    void delayBlinkWithCount(unsigned int numberOfTimes);
-    void delayBlinkWithCount(unsigned int numberOfTimes, unsigned int blinkPeriod);
+    void fusedPulse(long myFuseLength, int myPulseTimes);
+	
+	int getDutyCycle(void);
+	void setDutyCycle(int);
+	
+	long getFullPeriod(void);
+	void setFullPeriod(long);
 
-    void turnOnAnalog(void);
-    void turnOnAnalog(byte brightness);
     
-    void brighten(void);
-    void dim(void);
-    
-    void brighten(unsigned char);
-    void dim(unsigned char increment);
-
-
-	//void blinkWithAnalog(void);
-	//void blinkWithAnalog(byte brightness);
-	//void delayBlinkWithCountAndAnalog(unsigned int numberOfTimes, byte brightness);
-	//void delayBlinkWithCountAndAnalog(unsigned int numberOfTimes, unsigned int blinkPeriod, byte brightness);	
-	
-	unsigned int getBlinkPeriod(void);
-	void setBlinkPeriod(unsigned int); 
-	
-	unsigned char getCurrentBrightness(void);
-	unsigned char getDefaultBrightness(void);
-    void setCurrentBrightness(unsigned char);	
-	void setDefaultBrightness(unsigned char); 
-	
-    unsigned char getBrightnessIncrement(void);
-	void setBrightnessIncrement(unsigned char); 
-
-
 
 
   // library-accessible "private" interface
@@ -82,38 +58,28 @@ class FancyLED {
     bool _type;  //direct pin or shift register
     bool _mode;  //HIGH == pressed (1) or LOW == pressed (0)
     
-    bool _lastState;
-    bool _currentState;
+    int _lastState;
+    int _currentState;
     bool _pinState;
-        	
-	unsigned int _blinkOnPeriod;  //same as on duration
-	//unsigned int _blinkOffPeriod;
-	
-	byte _dBrightness;
-    byte _cBrightness;
-    byte _lBrightness;
-    unsigned char _brightnessIncrement;
-	
-	bool _changed;
-    bool _justOn;
-    bool _justOff;
-    //unsigned int _onCount;
-    //unsigned int _offCount;
-	
-    unsigned long int _lastOnTime;
-    unsigned long int _currentOnTime;
-    unsigned long int _lastOffTime;
-    unsigned long int _currentOffTime;
-    unsigned long int _blinkFlipTime;
-	
+    
+    long _fuseTimer;
+    
+    int _onPeriod;
+    int _offPeriod;
+    int _dutyCycle;
+    long _fullPeriod;
+   //long _longHolder;
+        		
+    bool _pulseFlag;    		
+
+    unsigned long int _flipTime;	
 	unsigned long int _currentTime;
 	
-	bool _toggleFlag;
+	int _currentPulseCount;
+	int _goalPulseCount;
+
 	
 	void updatePin(bool);
-	void updatePinAnalog(byte);
-	void updateBrightness(int, unsigned char);
-
   
 };
 

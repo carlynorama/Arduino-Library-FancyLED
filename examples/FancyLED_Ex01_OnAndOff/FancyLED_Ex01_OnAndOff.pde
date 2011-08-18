@@ -1,5 +1,5 @@
 /*
- * FanceyLED Library Example 1
+ * FancyLED Library Example 1
  * ------------
  *
  * Circuit: 
@@ -7,9 +7,11 @@
  *          - Extra LED on pin 9
  *
  * Behavior: 
+ *          Two LED's when one is on, the other is off - based on button
+ *          state. 
  *
  * Created 4 April 2010
- * Updated 29 October 2010
+ * Updated 17 August 2011
  * by Carlyn Maw
  *
  */

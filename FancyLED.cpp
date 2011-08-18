@@ -1,8 +1,8 @@
 /*
   FancyLED.h - FancyLED for Wiring/Arduino
-  (cc) 2007 Carlyn Maw .  Some rights reserved.
+  (cc) 2011 Carlyn Maw, Attribute, Share Alike
   
-  Created 29 Oct 2010
+  Created 06 July 2011
   Version 0.1
 */
 
@@ -34,9 +34,12 @@ FancyLED::FancyLED(int myPin, bool myMode)
     _currentState = 0;
     _pinState= 0;
     
-    _blinkOnPeriod = 500;
-    _dBrightness = 100;
-    _brightnessIncrement = 1;
+    _dutyCycle = 10;
+    _fullPeriod = 1000;
+    _fuseTimer = 0;
+    
+    _goalPulseCount = 1;
+    _currentPulseCount = 0;
       
 }
 
@@ -56,9 +59,12 @@ FancyLED::FancyLED(int myBit, bool myMode, unsigned char *myRegister)
     _currentState = 0;
     _pinState= 0;
     
-    _blinkOnPeriod = 500;
-    _dBrightness = 70;
-    _brightnessIncrement = 1;
+    _dutyCycle = 10;
+    _fullPeriod = 1000;
+    _fuseTimer = 0;
+    
+    _goalPulseCount = 1;
+    _currentPulseCount = 0;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
@@ -66,205 +72,175 @@ FancyLED::FancyLED(int myBit, bool myMode, unsigned char *myRegister)
 
 //---------////////////////////MAIN LOOP / LISTENER ///////////--------------//
 
+void FancyLED::update(void) {
+           update(millis());
+}
+
+
+
+void FancyLED::update(unsigned long newCurrentTime) {
+      __label__ fleeUpdate;
+      _currentTime = newCurrentTime;
+      
+      
+      if (_fuseTimer > _currentTime) {
+        //Serial.println("saw fuse");
+        //_fuseTimer --;
+        goto fleeUpdate;
+      } 
+      
+      if (_currentPulseCount < _goalPulseCount) {
+         _pulseFlag = true;
+      } else if (_currentPulseCount >= _goalPulseCount) {
+      }
+      
+      
+      
+      // if (_pulseFlag && _countFlag) {
+      if (_pulseFlag) {
+        //_longHolder = (_fullPeriod * _dutyCycle) / 100;
+        //_onPeriod = int(_longHolder);
+         _onPeriod = (_fullPeriod * _dutyCycle) / 100;
+        _offPeriod = (_fullPeriod - _onPeriod);
+        //Serial.println(_onPeriod);
+
+      //if my state is ready 
+      if (_currentState == 0) {
+        //get the time
+        _flipTime = _currentTime;
+        //set my state to firing
+        _currentState = 1;
+        //turn on the pin
+        _pinState = _mode;
+        updatePin(_pinState);
+      } 
+      //if my state is firing
+      else if (_currentState == 1) { 
+        if ((_onPeriod) < (_currentTime - _flipTime)) {
+          //if it's time, turn me off
+          _flipTime = _currentTime;
+          _currentState = 2;
+          _pinState = !_mode;
+          updatePin(_pinState);
+        }    
+      } 
+      //if my state is resting
+      else if (_currentState == 2) {
+        //keep me off
+        _pinState = !_mode;
+        updatePin(_pinState);
+        //check the time and make me ready
+        if ((_offPeriod) < (_currentTime - _flipTime)) {
+          _currentState = 0;
+          _currentPulseCount++;
+          _pulseFlag = false;
+          _flipTime = _currentTime;
+        }
+    
+      }
+    }
+    
+    fleeUpdate:;
+}
+
+
 void FancyLED::setCurrentTime(unsigned long newCurrentTime) {
     _currentTime = newCurrentTime;
 }
 
-bool FancyLED::getState(void){
+int FancyLED::getState(void){
     return _currentState;
-}
-
-bool FancyLED::isOn(void){
-    return _currentState;
-}
-
-bool FancyLED::isOff(void){
-    return !_currentState;
 }
 
 
 
 void FancyLED::turnOn(void){
-	_pinState = _mode;
-	_lastState = _currentState;
-	_currentState = _mode;
-	_lBrightness  = _cBrightness;
-	_cBrightness = 255;
-	//_lastOnTime = _currentOnTime;
-    //_currentOnTime = _currentTime;
-    _blinkFlipTime = _currentTime + _blinkOnPeriod;
+    _pinState = _mode;
     updatePin(_pinState);
+    
+	_lastState = _currentState;
+	_currentState = 1; //firing
+    _flipTime = _currentTime;
+
 }
 
 void FancyLED::turnOff(void){
-	_pinState = !_mode;
-	_lastState = _currentState;
-	_currentState = !_mode;
-	_lBrightness  = _cBrightness;
-	_cBrightness = 0;
-    //_lastOffTime = _currentOffTime;
-	//_currentOffTime = _currentTime;
-	_blinkFlipTime = _currentTime + _blinkOnPeriod;
-
+    _pinState = !_mode;
     updatePin(_pinState);
-}
 
-void FancyLED::toggle(void){
 	_lastState = _currentState;
-	_currentState ? _currentState=false : _currentState=true;	
-	_currentState ? _pinState=_mode : _pinState = !_mode;
-	_blinkFlipTime = _currentTime;
-	_lBrightness  = _cBrightness;
-    _cBrightness = _currentState*255;
-    updatePin(_pinState);
-}
-
-
-void FancyLED::setState(bool newState) {
-        newState ? turnOn() : turnOff();    
-}
-
-void FancyLED::blinkWithoutDelay(void) {
-        
-    if ((_blinkOnPeriod) < (_currentTime - _blinkFlipTime)) {        
-        _currentState ? _currentState=false : _currentState=true;	
-        _currentState ? _pinState=_mode : _pinState = !_mode;
-        //update the blinkFlipTime with the current time.
-        _blinkFlipTime = _currentTime;       
-    }
-    
-    updatePin(_pinState);  //can't use toggle b/c better to have this
-                     //value on the outside of the if
-}
-  
-void FancyLED::blinkWithoutDelay(unsigned int myBlinkPeriod) {
-
-   _blinkOnPeriod = myBlinkPeriod;
-   blinkWithoutDelay();
+	_currentState = 2; //waiting
 
 }
 
-void FancyLED::delayBlinkWithCount(unsigned int numberOfTimes, unsigned int blinkPeriod) {
-    
-    _blinkOnPeriod = blinkPeriod;
-    delayBlinkWithCount(numberOfTimes);
-
-}
-
-void FancyLED::delayBlinkWithCount(unsigned int numberOfTimes) {
-    for (int i=0; i < numberOfTimes; i++) {
-        _blinkFlipTime = _currentTime; 
-        _currentState=true;
-        _lBrightness  = _cBrightness;
-        _cBrightness = 255;
-        _pinState=_mode;
-        updatePin(_pinState); 
-        delay(_blinkOnPeriod);
-        _blinkFlipTime = _currentTime; 
-        _currentState=false;
-        _lBrightness  = _cBrightness;
-        _cBrightness = 0;
-        _pinState= !_mode;
-        updatePin(_pinState);
-        delay(_blinkOnPeriod);
-    }
-    //updatePin(_pinState);  //can't use toggle b/c better to have this
-                         //value on the outside of the if
-}
-
-unsigned int FancyLED::getBlinkPeriod(void) {
-    return _blinkOnPeriod;
-}
-	
-void FancyLED::setBlinkPeriod(unsigned int newBlinkPeriod) {
-    _blinkOnPeriod = newBlinkPeriod;    
-}
-
-
-void FancyLED::turnOnAnalog(byte myBrightness){
-   setCurrentBrightness(myBrightness);
-}
-
-void FancyLED::turnOnAnalog(void){
-    setCurrentBrightness(_dBrightness);
-}
-
-unsigned char FancyLED::getCurrentBrightness(void) {
-    return _cBrightness;
-}
-
-void FancyLED::setCurrentBrightness(unsigned char myBrightness) {     
-        if (myBrightness) {
-        _pinState = _mode;
-        _lastState = _currentState;
-        _currentState = _mode;
-        _lBrightness  = _cBrightness;
-        _cBrightness = myBrightness;
-        //_lastOnTime = _currentOnTime;
-        //_currentOnTime = _currentTime;
-        _blinkFlipTime = _currentTime + _blinkOnPeriod;        
-        updatePinAnalog(_cBrightness);
+void FancyLED::toggle(void) {
+    if (_currentState == 1) {
+        turnOff();       
     } else {
-        turnOff();
+        turnOn();
     }
 }
 
-unsigned char FancyLED::getDefaultBrightness(void) {
-    return _dBrightness;
+void FancyLED::pulse(char myPulseTimes) {
+
+    _pulseFlag = true;
+    _goalPulseCount = myPulseTimes;
+    _currentPulseCount = 0;
 }
-	
-void FancyLED::setDefaultBrightness(unsigned char myBrightness) {
-    _dBrightness = myBrightness;  
+
+void FancyLED::pulse(char myPulseTimes, int myPeriod, int myDutyCycle) {
+
+    _dutyCycle = myDutyCycle;
+    _fullPeriod = myPeriod;
+    pulse(myPulseTimes);
+    
+}
+
+void FancyLED::pulse(void) {
+
+    pulse(1);
+    
+}
+
+void FancyLED::fusedPulse(long myFuseLength, int myPulseTimes){
+    _fuseTimer = myFuseLength + _currentTime;
+    pulse(myPulseTimes);
+}
+
+int FancyLED::getDutyCycle(void){
+    return _dutyCycle;
+}
+
+void FancyLED::setDutyCycle(int newDC) {
+    _dutyCycle = newDC;
+}
+
+long FancyLED::getFullPeriod(void){
+    return _fullPeriod;
+}
+
+void FancyLED::setFullPeriod(long newFP){
+    _fullPeriod = newFP;
 }
 
 
-void FancyLED::brighten(void) {
-    brighten(_brightnessIncrement);
-}
-	
-void FancyLED::dim(void) {
-    dim(_brightnessIncrement);
-}
-
-void FancyLED::brighten(unsigned char increment) {
-    updateBrightness(1, increment);
-}
-	
-void FancyLED::dim(unsigned char increment) {
-    updateBrightness(-1, increment);
-}
-
-unsigned char FancyLED::getBrightnessIncrement(void) {
-    return _brightnessIncrement;
-}
-	
-void FancyLED::setBrightnessIncrement(unsigned char increment) {
-    _brightnessIncrement = increment;  
-}
-  
 
 // Private Methods //////////////////////////////////////////////////////////////
 // Functions available to the library only.
 
 
 void FancyLED::updatePin(bool pinValue) {
-    if (pinValue) {
-        digitalWrite(_myPin, HIGH);
+    
+    if(!_type) {
+        digitalWrite(_myPin, pinValue);
     } else {
-        digitalWrite(_myPin, LOW);
+        _registerValue = *_myRegister;
+        if (pinValue) {
+            _registerValue |= (1 << _myBit);
+        } else {
+            _registerValue &=~ (1 << _myBit);
+        }
+      *_myRegister = _registerValue;  
     }
 
 }
-
-void FancyLED::updateBrightness(int directionMultiplier, unsigned char increment) {
-    setCurrentBrightness(constrain((_cBrightness + (directionMultiplier*increment)), 0, 255));
-}
-
-void FancyLED::updatePinAnalog(byte brightness) {
-    if (_mode) {
-        analogWrite(_myPin, brightness);
-    } else {
-        analogWrite(_myPin, 255-brightness);
-    }
-}
-

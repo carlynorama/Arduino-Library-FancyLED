@@ -1,5 +1,5 @@
 /*
- * FanceyLED Library Example 2
+ * FancyLED Library Example 2
  * ------------
  *
  * Circuit: 
