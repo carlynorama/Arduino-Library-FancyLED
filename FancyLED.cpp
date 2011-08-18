@@ -79,14 +79,11 @@ void FancyLED::update(void) {
 
 
 void FancyLED::update(unsigned long newCurrentTime) {
-      __label__ fleeUpdate;
       _currentTime = newCurrentTime;
       
       
       if (_fuseTimer > _currentTime) {
-        //Serial.println("saw fuse");
-        //_fuseTimer --;
-        goto fleeUpdate;
+        return;
       } 
       
       if (_currentPulseCount < _goalPulseCount) {
@@ -140,7 +137,6 @@ void FancyLED::update(unsigned long newCurrentTime) {
       }
     }
     
-    fleeUpdate:;
 }
 
 
