@@ -34,7 +34,7 @@ FancyLED::FancyLED(int myPin, bool myMode)
     _currentState = 0;
     _pinState= 0;
     
-    _dutyCycle = 10;
+    _dutyCycle = 50;
     _fullPeriod = 1000;
     _fuseTimer = 0;
     
@@ -59,7 +59,7 @@ FancyLED::FancyLED(int myBit, bool myMode, unsigned char *myRegister)
     _currentState = 0;
     _pinState= 0;
     
-    _dutyCycle = 10;
+    _dutyCycle = 50;
     _fullPeriod = 1000;
     _fuseTimer = 0;
     
