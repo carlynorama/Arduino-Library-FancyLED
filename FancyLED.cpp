@@ -90,7 +90,7 @@ void FancyLED::update(unsigned long newCurrentTime) {
         return;
       } 
       
-      if (_currentPulseCount < _goalPulseCount) {
+      if (_goalPulseCount == 0 or _currentPulseCount < _goalPulseCount) {
          _pulseFlag = true;
       } else if (_currentPulseCount >= _goalPulseCount) {
       }
@@ -198,7 +198,7 @@ void FancyLED::pulse(char myPulseTimes, int myPeriod, int myDutyCycle) {
 
 void FancyLED::pulse(void) {
 
-    pulse(1);
+    pulse(0);
     
 }
 
