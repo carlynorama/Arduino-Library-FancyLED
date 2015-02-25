@@ -38,8 +38,8 @@ class FancyLED {
     void turnOff(void);
     void toggle(void);
  
-    void pulse(char); 
-    void pulse(char, int, int);
+    void pulse(int); 
+    void pulse(int, int, int);
 	void pulse(void);	
 
     void fusedPulse(long myFuseLength, int myPulseTimes);
