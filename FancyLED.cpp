@@ -181,14 +181,14 @@ void FancyLED::toggle(void) {
     }
 }
 
-void FancyLED::pulse(char myPulseTimes) {
+void FancyLED::pulse(int myPulseTimes) {
 
     _pulseFlag = true;
     _goalPulseCount = myPulseTimes;
     _currentPulseCount = 0;
 }
 
-void FancyLED::pulse(char myPulseTimes, int myPeriod, int myDutyCycle) {
+void FancyLED::pulse(int myPulseTimes, int myPeriod, int myDutyCycle) {
 
     _dutyCycle = myDutyCycle;
     _fullPeriod = myPeriod;
