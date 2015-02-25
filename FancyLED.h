@@ -10,7 +10,11 @@
 #define FancyLED_h
 
 // include types & constants of Wiring core API
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "Arduino.h"
+#else
 #include "WProgram.h"
+#endif
 
 // library interface description
 class FancyLED {
