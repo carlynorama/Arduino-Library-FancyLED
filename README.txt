@@ -108,7 +108,7 @@ myInstance.pulse(char myPulseTimes, int myPeriod, int myDutyCycle)
     
 myInstance.pulse();
     
-    BEHAVIOR: This function will just pulse the LED once at the default/current settings
+    BEHAVIOR: This function will pulse the LED forever (if myInstance.update() is called)
 
 myInstance.fusedPulse(long myFuseLength, int myPulseTimes);
 
