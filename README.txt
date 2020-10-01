@@ -42,7 +42,7 @@ Public Functions
 
 FancyLED myInstance = FancyLED(int myPin, bool myMode);
 
-FancyLED myInstance = FancyLED(int pinNumber, bool pressedState);
+FancyLED myInstance = FancyLED(int pinNumber, bool pressedState); //hear you need to declare pin 
 
 	myInstance = some name
 	myPin = some int representing what pin the LED is attached to
@@ -85,7 +85,7 @@ myInstance.getState();
     
 myInstance.turnOn();
     
-    BEHAVIOR: Turns it on. (state goes to 1, led turns on)
+    BEHAVIOR: Turns it on. (state goes to 1, led turns on) //1 is high input led will be Glow
 
 myInstance.turnOff();
     
